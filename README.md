@@ -11,3 +11,5 @@ Os seguintes scripts estão prontos para testar com o modelo de Cam-Clay:
 
 Para instalar as dependências, recomenda-se o uso do
 [`uv`](https://docs.astral.sh/uv/).
+
+Documentação: https://modelos-constitutivos.readthedocs.io/en/latest/index.html

@@ -12,3 +12,7 @@ modelos
 funcoesaux
 integracao
 ```
+
+## Links
+
+- [Repositório do Github](https://github.com/diogo-rossi/modelos-constitutivos)
