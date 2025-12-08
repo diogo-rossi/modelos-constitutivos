@@ -6,7 +6,10 @@ from .tensortypes import Vetor6x1
 
 class Hardening(ABC):
     s: float = 0.0
-    """Variavel interna de endurecimento do tipo tensao (`s`)"""
+    """Variavel interna de endurecimento do tipo tensao (`s`)
+    
+    Por default, igual a zero: `s = 0`.
+    """
 
     def dh(self, epsilonP: Vetor6x1) -> float:
         """Variacao da variavel interna de endurecimento do tipo
