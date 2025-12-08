@@ -1,0 +1,26 @@
+[project]
+name = "modelos-constitutivos"
+version = "0.0.0"
+description = "Modelos constitutivos"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "furo>=2025.9.25",
+    "kaleido>=1.2.0",
+    "matplotlib>=3.10.7",
+    "myst-parser>=4.0.1",
+    "numpy>=2.3.5",
+    "pandas>=2.3.3",
+    "plotly>=6.5.0",
+    "pyautogui>=0.9.54",
+    "pygetwindow>=0.0.9",
+    "sphinx>=8.2.3",
+    "sphinx-copybutton>=0.5.2",
+    "sphinxnotes-comboroles>=1.0",
+    "streamlit>=1.52.0",
+    "taskipy>=1.14.1",
+]
+
+[tool.taskipy.tasks]
+docs = { cmd = "make html", cwd = "./docs/sphinx", help = "Make docs with sphinx" }
+open = { cmd = "index.html", cwd = "./docs/sphinx/build/html", help = "Open sphinx docs" }
