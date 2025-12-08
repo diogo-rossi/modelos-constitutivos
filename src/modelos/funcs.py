@@ -50,7 +50,7 @@ def octa(sigma: Vetor6 | Vetor1x6 | Vetor6x1 | Matriz3x3) -> float:
 
 
 def epsV(epsilon: Vetor6 | Vetor1x6 | Vetor6x1 | Matriz3x3) -> float:
-    """Retora a deformacao volumetrica, igual a soma: `epsX + epsY + epsZ`"""
+    """Retorna a deformacao volumetrica, igual a soma: `epsX + epsY + epsZ`"""
     return trace(epsilon)
 
 
