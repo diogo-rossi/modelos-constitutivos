@@ -14,7 +14,7 @@ class Hardening(ABC):
 
         Por default, igual a zero: `dh = 0`.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/dh_abs.png
+        .. figure::  images/dh_abs.png
         """
         return 0.0
 
@@ -24,7 +24,7 @@ class Hardening(ABC):
 
         Por default, igual a um vetor nulo: `grad_h = {0,0,0,0,0,0}`.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/gradh_abs.png
+        .. figure:: images/gradh_abs.png
         """
         return vc([0, 0, 0, 0, 0, 0])
 
@@ -36,13 +36,13 @@ class Hardening(ABC):
 
         Por default, igual a zero: `ds/dh = 0`.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/dsdh_abs.png
+        .. figure:: images/dsdh_abs.png
         """
         return 0.0
 
     def update_hardening(self, epsilonP: Vetor6x1) -> None:
         """Atualiza a variavel interna de endurecimento do tipo tensao (`s`) usando a sua derivada
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/s_abs.png
+        .. figure:: images/s_abs.png
         """
         self.s += self.dsdh() * self.dh(epsilonP)

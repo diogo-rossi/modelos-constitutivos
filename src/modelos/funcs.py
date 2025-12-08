@@ -57,7 +57,7 @@ def epsV(epsilon: Vetor6 | Vetor1x6 | Vetor6x1 | Matriz3x3) -> float:
 def desv(sigma: Vetor6 | Vetor1x6 | Vetor6x1 | Matriz3x3) -> float:
     """Retorna a tensao desviadora, dada pela formula abaixo:
     
-    .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/desv.png
+    .. figure:: images/desv.png
     """
     sx, sy, sz, txy, tyz, tzx = vetor(sigma)
     return float(

@@ -31,7 +31,7 @@ class CamClayElastico(Elastic):
 
         Especificado para o Cam-Clay. Em funcao do `K` e do Poisson.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/young_cc.png
+        .. figure:: images/young_cc.png
         """
         return self.K * 3 * (1 - 2 * self.poisson)
 
@@ -41,7 +41,7 @@ class CamClayElastico(Elastic):
 
         Especificado para o Cam-Clay.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/Kb_cc.png
+        .. figure:: images/Kb_cc.png
         """
         return (1 + self.e) * self.p / self.k
 
@@ -69,7 +69,7 @@ class CamClayHardening(Hardening):
 
         Especificada para o Cam-Clay: Igual a tensao de pre-adensamento (`p0`).
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/s_cc.png
+        .. figure:: images/s_cc.png
         """
         return self.p0
 
@@ -83,7 +83,7 @@ class CamClayHardening(Hardening):
 
         Especificada para o Cam-Clay: Igual a variacao da deformacao volumétrica plastica.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/dh_cc.png
+        .. figure:: images/dh_cc.png
         """
         return self.depsVP(epsilonP)
 
@@ -93,7 +93,7 @@ class CamClayHardening(Hardening):
 
         Especificada para o Cam-Clay. Igual ao gradiente da deformacao volumétrica plastica.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/gradh_cc.png
+        .. figure:: images/gradh_cc.png
         """
         return self.grad_epsVP()
 
@@ -106,7 +106,7 @@ class CamClayHardening(Hardening):
         Especificado para o Cam-Clay: Igual a derivada da tensao de pre-adensamento (`s = p0`) em relacao a
         deformacao volumetrica plastica (`h = epsVP`).
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/dsdh_cc.png
+        .. figure:: images/dsdh_cc.png
         """
         return self.dp0depsV()
 
@@ -119,7 +119,7 @@ class CamClayHardening(Hardening):
 
         Igual a variacao da variavel interna de endurecimento do tipo deformacao (`h`) do Cam-Clay.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/depsVP.png
+        .. figure:: images/depsVP.png
         """
         return epsV(depsilonP)
 
@@ -128,7 +128,7 @@ class CamClayHardening(Hardening):
 
         Igual ao vetor gradiente da variavel interna de endurecimento do tipo deformacao (`h`) do Cam-Clay.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/gradepsV_cc.png
+        .. figure:: images/gradepsV_cc.png
         """
         return vc([1, 1, 1, 0, 0, 0])
 
@@ -137,7 +137,7 @@ class CamClayHardening(Hardening):
 
         Igual ao modulo de endurecimento (`H`) especificado para o Cam-Clay.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/dp0depsV_cc.png
+        .. figure:: images/dp0depsV_cc.png
         """
         return ((1 + self.e) / (self.L - self.k)) * self.p0
 
@@ -177,7 +177,7 @@ class CamClayPlastico(Plastic):
 
         Especificada para o Cam-Clay.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/f_cc.png
+        .. figure:: images/f_cc.png
         """
         Mc, p, q, p0 = self.Mc, self.p, self.q, self.s
         return (Mc**2) * (p**2) - (Mc**2) * p0 * p + q**2
@@ -187,7 +187,7 @@ class CamClayPlastico(Plastic):
 
         Especificada para o Cam-Clay, calculada por partes.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/gradf_cc.png
+        .. figure:: images/gradf_cc.png
         """
         return self.dfdp() * self.grad_p() + self.dfdq() * self.grad_q()
 
@@ -196,7 +196,7 @@ class CamClayPlastico(Plastic):
 
         Especificada para o Cam-Clay.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/q_cc.png
+        .. figure:: images/q_cc.png
         """
         Mc, p0 = self.Mc, s
         return np.sqrt(np.abs((Mc**2) * p0 * p - (Mc**2) * (p**2)))
@@ -207,7 +207,7 @@ class CamClayPlastico(Plastic):
 
         Especificada para o Cam-Clay.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/dfds_cc.png
+        .. figure:: images/dfds_cc.png
         """
         return self.dfdp0()
 
@@ -218,7 +218,7 @@ class CamClayPlastico(Plastic):
     def dfdp(self) -> float:
         """Derivada de `f` em relacao a `p`, usada no calculo do `grad(f)` do Cam-Clay.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/dfdp_cc.png
+        .. figure:: images/dfdp_cc.png
         """
         Mc, p0, p = self.Mc, self.p0, self.p
         return (Mc**2) * (2 * p - p0)
@@ -226,7 +226,7 @@ class CamClayPlastico(Plastic):
     def dfdq(self) -> float:
         """Derivada de `f` em relacao a `q`, usada no calculo do `grad(f)` do Cam-Clay.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/dfdq_cc.png
+        .. figure:: images/dfdq_cc.png
         """
         q = self.q
         return 2 * q
@@ -234,14 +234,14 @@ class CamClayPlastico(Plastic):
     def grad_p(self) -> Vetor6x1:
         """Gradiente de `p` em relacao ao estado de tensao, usada no calculo do `grad(f)` do Cam-Clay.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/gradp_cc.png
+        .. figure:: images/gradp_cc.png
         """
         return vc([1 / 3, 1 / 3, 1 / 3, 0, 0, 0])
 
     def grad_q(self) -> Vetor6x1:
         """Gradiente de `q` em relacao ao estado de tensao, usada no calculo do `grad(f)` do Cam-Clay.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/gradq_cc.png
+        .. figure:: images/gradq_cc.png
         """
         sigma, p, q = self.sigma, self.p, self.q
         if q < 0.00000001:
@@ -251,7 +251,7 @@ class CamClayPlastico(Plastic):
     def dfdp0(self) -> float:
         """Derivada de `f` em relacao a `p0`, igual a `df/ds` do Cam-Clay.
 
-        .. figure:: file:///C:/Users/rossi/0/repos/Modelos-constitutivos/src/modelos/images/dfdp0_cc.png
+        .. figure:: images/dfdp0_cc.png
         """
         Mc, p = self.Mc, self.p
         return -(Mc**2) * p
