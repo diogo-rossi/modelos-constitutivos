@@ -8,6 +8,23 @@ from numpy.typing import NDArray
 
 
 class Plastic(Elastic, Hardening, ABC):
+
+    @property
+    def phi(self) -> float:
+        """Angulo de atrito no espaco dos circulos de Mohr (`sigma`-`tau`)
+
+        .. figure:: images/phi_M.png
+        """
+        return np.asin(3 * self.Mc / (6 + self.Mc))
+
+    @property
+    def Mc(self) -> float:
+        """Inclinacao da envoltoria de cisalhamento `Mc` no espaco `p`-`q` (Linha de Estado Crítico)
+
+        .. figure:: images/Mc_phi.png
+        """
+        return 6 * np.sin(self.phi) / (3 - np.sin(self.phi))
+
     @abstractmethod
     def func_plastica(self) -> float:
         """Calcula e retorna o valor da funcao de plastificacao (`f`) em termos do estado de tensao.
@@ -62,19 +79,3 @@ class Plastic(Elastic, Hardening, ABC):
         return float(
             ((Df.T @ De @ deps) / (Df.T @ De @ Dg - self.dfds() * self.dsdh() * self.grad_h().T @ Dg))[0, 0]
         )
-
-    @property
-    def phi(self) -> float:
-        """Angulo de atrito no espaco dos circulos de Mohr (`sigma`-`tau`)
-
-        .. figure:: images/phi_M.png
-        """
-        return np.asin(3 * self.Mc / (6 + self.Mc))
-
-    @property
-    def Mc(self) -> float:
-        """Inclinacao da envoltoria de cisalhamento `Mc` no espaco `p`-`q` (Linha de Estado Crítico)
-
-        .. figure:: images/Mc_phi.png
-        """
-        return 6 * np.sin(self.phi) / (3 - np.sin(self.phi))
