@@ -97,7 +97,7 @@ modelos: dict[str, ParametrosClasse] = {
             "L": {"nome": "Lambda ($\\lambda$)", "valor": 0.1},
             "v": {"nome": "Poisson ($\\nu$)", "valor": 0.4},
             "Mc": {"nome": "$M_{crit}$", "valor": 1.1},
-            "e0": {"nome": "Void ratio (e)", "valor": 0.9},
+            "e0": {"nome": "Void ratio inicial ($e_0$)", "valor": 0.9},
             "p0": {"nome": "$P_0$ (kPa)", "valor": 100},
         },
         "classe": CamClay,
