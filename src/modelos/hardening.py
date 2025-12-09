@@ -34,8 +34,8 @@ class Hardening(ABC):
     def dsdh(self) -> float:
         """Calcula e retorna o modulo de endurecimento (`H`).
 
-        Definido como a derivada da variavel interna de endurecimento do tipo tensao (`s`) em
-        relacao a variavel interna de endurecimento do tipo deformacao (`h`).
+        Definido como a derivada da variavel interna de endurecimento do tipo tensao
+        (`s`) em relacao a variavel interna de endurecimento do tipo deformacao (`h`).
 
         Por default, igual a zero: `ds/dh = 0`.
 
@@ -44,7 +44,8 @@ class Hardening(ABC):
         return 0.0
 
     def update_hardening(self, epsilonP: Vetor6x1) -> None:
-        """Atualiza a variavel interna de endurecimento do tipo tensao (`s`) usando a sua derivada
+        """Atualiza a variavel interna de endurecimento do tipo tensao (`s`) usando a
+        sua derivada
 
         .. figure:: images/s_abs.png
         """

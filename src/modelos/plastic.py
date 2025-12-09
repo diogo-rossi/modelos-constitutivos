@@ -19,7 +19,8 @@ class Plastic(Elastic, Hardening, ABC):
 
     @property
     def Mc(self) -> float:
-        """Inclinacao da envoltoria de cisalhamento `Mc` no espaco `p`-`q` (Linha de Estado Crítico)
+        """Inclinacao da envoltoria de cisalhamento `Mc` no espaco `p`-`q` (Linha
+        de Estado Crítico)
 
         .. figure:: images/Mc_phi.png
         """
@@ -27,7 +28,8 @@ class Plastic(Elastic, Hardening, ABC):
 
     @abstractmethod
     def func_plastica(self) -> float:
-        """Calcula e retorna o valor da funcao de plastificacao (`f`) em termos do estado de tensao.
+        """Calcula e retorna o valor da funcao de plastificacao (`f`) em termos do
+        estado de tensao.
 
         .. figure:: images/f_abs.png
         """
@@ -35,14 +37,17 @@ class Plastic(Elastic, Hardening, ABC):
 
     @abstractmethod
     def grad_f(self) -> Vetor6x1:
-        """Calcula e retorna o vetor gradiente da funcao de plastificacao (`f`) em relacao ao estado de tensao.
+        """Calcula e retorna o vetor gradiente da funcao de plastificacao (`f`) em
+        relacao ao estado de tensao.
 
         .. figure:: images/gradf_abs.png
         """
         raise NotImplementedError("Needs to implement")
 
     @abstractmethod
-    def q_plastic(self, p: float | NDArray[float64], s: float | NDArray[float64]) -> float | NDArray[float64]:
+    def q_plastic(
+        self, p: float | NDArray[float64], s: float | NDArray[float64]
+    ) -> float | NDArray[float64]:
         """Calcula a tensao desviadora de plastificacao em funcao da tensao octaedrica.
 
         .. figure:: images/q_abs.png
@@ -50,9 +55,11 @@ class Plastic(Elastic, Hardening, ABC):
         raise NotImplementedError("Needs to implement")
 
     def grad_g(self) -> Vetor6x1:
-        """Calcula e retorna o vetor gradiente da funcao potencial plastico (`g`) em relacao ao estado de tensao.
+        """Calcula e retorna o vetor gradiente da funcao potencial plastico (`g`) em
+        relacao ao estado de tensao.
 
-        Por default, igual ao gradiente da funcao de plastificacao (`f`): `grad_g = grad_f` (fluxo associado).
+        Por default, igual ao gradiente da funcao de plastificacao (`f`):
+        `grad_g = grad_f` (fluxo associado).
 
         .. figure:: images/gradg_abs.png
         """
@@ -77,5 +84,8 @@ class Plastic(Elastic, Hardening, ABC):
         Dg = self.grad_g()
         De = self.matriz_elastica()
         return float(
-            ((Df.T @ De @ deps) / (Df.T @ De @ Dg - self.dfds() * self.dsdh() * self.grad_h().T @ Dg))[0, 0]
+            (
+                (Df.T @ De @ deps)
+                / (Df.T @ De @ Dg - self.dfds() * self.dsdh() * self.grad_h().T @ Dg)
+            )[0, 0]
         )

@@ -8,9 +8,9 @@ from .funcs import epsV, vc
 from numpy import float64
 from numpy.typing import NDArray
 
-##############################################################################################################
+########################################################################################
 # %%          Elastico
-##############################################################################################################
+########################################################################################
 
 
 class CamClayElastico(Elastic):
@@ -21,9 +21,9 @@ class CamClayElastico(Elastic):
         self.poisson = v
         self.k = k
 
-    ##########################################################################################################
+    ####################################################################################
     # %:          Metodos re-implementados
-    ##########################################################################################################
+    ####################################################################################
 
     @property
     def K(self) -> float:
@@ -46,9 +46,9 @@ class CamClayElastico(Elastic):
         return self.K * 3 * (1 - 2 * self.poisson)
 
 
-##############################################################################################################
+########################################################################################
 # %%          Endurecimento
-##############################################################################################################
+########################################################################################
 
 
 class CamClayHardening(Hardening):
@@ -59,9 +59,9 @@ class CamClayHardening(Hardening):
         self.e = e0
         self.p0 = p0
 
-    ##########################################################################################################
+    ####################################################################################
     # %:          Metodos re-implementados
-    ##########################################################################################################
+    ####################################################################################
 
     @property
     def s(self) -> float:
@@ -81,7 +81,7 @@ class CamClayHardening(Hardening):
         """Variacao da variavel interna de endurecimento do tipo
         deformacao (`h`) em funcao do estado de deformacao plastica.
 
-        Especificada para o Cam-Clay: Igual a variacao da deformacao volumétrica plastica.
+        Especificada para o Cam-Clay: Igual variacao da deformacao volumétrica plastica.
 
         .. figure:: images/dh_cc.png
         """
@@ -91,7 +91,7 @@ class CamClayHardening(Hardening):
         """Calcula e retorna o vetor gradiente da variavel interna de endurecimento
         do tipo deformacao (`h`) em funcao do estado de deformacao plastica.
 
-        Especificada para o Cam-Clay. Igual ao gradiente da deformacao volumétrica plastica.
+        Especificada para o Cam-Clay. Igual ao grad. da deformacao volumétrica plastica.
 
         .. figure:: images/gradh_cc.png
         """
@@ -100,24 +100,25 @@ class CamClayHardening(Hardening):
     def dsdh(self) -> float:
         """Calcula e retorna o modulo de endurecimento (`H`).
 
-        Definido como a derivada da variavel interna de endurecimento do tipo tensao (`s`) em
-        relacao a variavel interna de endurecimento do tipo deformacao (`h`).
+        Definido como a derivada da variavel interna de endurecimento do tipo tensao
+        (`s`) em relacao a variavel interna de endurecimento do tipo deformacao (`h`).
 
-        Especificado para o Cam-Clay: Igual a derivada da tensao de pre-adensamento (`s = p0`) em relacao a
-        deformacao volumetrica plastica (`h = epsVP`).
+        Especificado para o Cam-Clay: Igual a derivada da tensao de pre-adensamento (`s
+        = p0`) em relacao a deformacao volumetrica plastica (`h = epsVP`).
 
         .. figure:: images/dsdh_cc.png
         """
         return self.dp0depsV()
 
-    ##########################################################################################################
+    ####################################################################################
     # %:          Novos metodos
-    ##########################################################################################################
+    ####################################################################################
 
     def depsVP(self, depsilonP: Vetor6x1) -> float:
         """Variacao da deformacao volumetrica plastica.
 
-        Igual a variacao da variavel interna de endurecimento do tipo deformacao (`h`) do Cam-Clay.
+        Igual a variacao da variavel interna de endurecimento do tipo deformacao (`h`)
+        do Cam-Clay.
 
         .. figure:: images/depsVP.png
         """
@@ -126,14 +127,16 @@ class CamClayHardening(Hardening):
     def grad_epsVP(self) -> Vetor6x1:
         """Calcula e retorna o vetor gradiente da deformacao volumétrica plastica.
 
-        Igual ao vetor gradiente da variavel interna de endurecimento do tipo deformacao (`h`) do Cam-Clay.
+        Igual ao vetor gradiente da variavel interna de endurecimento do tipo deformacao
+        (`h`) do Cam-Clay.
 
         .. figure:: images/gradepsV_cc.png
         """
         return vc([1, 1, 1, 0, 0, 0])
 
     def dp0depsV(self) -> float:
-        """Derivada da tensao de pre-adensamento (`p0`) em relacao a deformacao volumetrica plastica (`depsVP`)
+        """Derivada da tensao de pre-adensamento (`p0`) em relacao a deformacao
+        volumetrica plastica (`depsVP`)
 
         Igual ao modulo de endurecimento (`H`) especificado para o Cam-Clay.
 
@@ -142,9 +145,9 @@ class CamClayHardening(Hardening):
         return ((1 + self.e) / (self.L - self.k)) * self.p0
 
 
-##############################################################################################################
+########################################################################################
 # %%          Plastificacao
-##############################################################################################################
+########################################################################################
 
 
 class CamClayPlastico(Plastic):
@@ -158,7 +161,8 @@ class CamClayPlastico(Plastic):
 
     @property
     def Mc(self) -> float:
-        """Inclinacao da envoltoria de cisalhamento `Mc` no espaco `p`-`q` (Linha de Estado Crítico)
+        """Inclinacao da envoltoria de cisalhamento `Mc` no espaco `p`-`q` (Linha de
+        Estado Crítico)
 
         Especificada para o Cam-Clay (dado de entrada).
         """
@@ -168,12 +172,13 @@ class CamClayPlastico(Plastic):
     def Mc(self, value: float) -> None:
         self._Mc = value
 
-    ##########################################################################################################
+    ####################################################################################
     # %:          Metodos re-implementados
-    ##########################################################################################################
+    ####################################################################################
 
     def func_plastica(self) -> float:
-        """Calcula e retorna o valor da funcao de plastificacao (`f`) em termos do estado de tensao.
+        """Calcula e retorna o valor da funcao de plastificacao (`f`) em termos do
+        estado de tensao.
 
         Especificada para o Cam-Clay.
 
@@ -183,7 +188,8 @@ class CamClayPlastico(Plastic):
         return (Mc**2) * (p**2) - (Mc**2) * p0 * p + q**2
 
     def grad_f(self) -> Vetor6x1:
-        """Calcula e retorna o vetor gradiente da funcao de plastificacao (`f`) em relacao ao estado de tensao.
+        """Calcula e retorna o vetor gradiente da funcao de plastificacao (`f`) em
+        relacao ao estado de tensao.
 
         Especificada para o Cam-Clay, calculada por partes.
 
@@ -191,7 +197,9 @@ class CamClayPlastico(Plastic):
         """
         return self.dfdp() * self.grad_p() + self.dfdq() * self.grad_q()
 
-    def q_plastic(self, p: float | NDArray[float64], s: float | NDArray[float64]) -> float | NDArray[float64]:
+    def q_plastic(
+        self, p: float | NDArray[float64], s: float | NDArray[float64]
+    ) -> float | NDArray[float64]:
         """Calcula a tensao desviadora de plastificacao em funcao da tensao octaedrica.
 
         Especificada para o Cam-Clay.
@@ -211,9 +219,9 @@ class CamClayPlastico(Plastic):
         """
         return self.dfdp0()
 
-    ##########################################################################################################
+    ####################################################################################
     # %:          Novos metodos
-    ##########################################################################################################
+    ####################################################################################
 
     def dfdp(self) -> float:
         """Derivada de `f` em relacao a `p`, usada no calculo do `grad(f)` do Cam-Clay.
@@ -232,21 +240,25 @@ class CamClayPlastico(Plastic):
         return 2 * q
 
     def grad_p(self) -> Vetor6x1:
-        """Gradiente de `p` em relacao ao estado de tensao, usada no calculo do `grad(f)` do Cam-Clay.
+        """Gradiente de `p` em relacao ao estado de tensao, usada no calculo do
+        `grad(f)` do Cam-Clay.
 
         .. figure:: images/gradp_cc.png
         """
         return vc([1 / 3, 1 / 3, 1 / 3, 0, 0, 0])
 
     def grad_q(self) -> Vetor6x1:
-        """Gradiente de `q` em relacao ao estado de tensao, usada no calculo do `grad(f)` do Cam-Clay.
+        """Gradiente de `q` em relacao ao estado de tensao, usada no calculo do
+        `grad(f)` do Cam-Clay.
 
         .. figure:: images/gradq_cc.png
         """
         sigma, p, q = self.sigma, self.p, self.q
         if q < 0.00000001:
             return np.zeros((6, 1))
-        return (3 / (2 * q)) * (sigma * vc([1, 1, 1, 2, 2, 2]) - p * vc([1, 1, 1, 0, 0, 0]))
+        return (3 / (2 * q)) * (
+            sigma * vc([1, 1, 1, 2, 2, 2]) - p * vc([1, 1, 1, 0, 0, 0])
+        )
 
     def dfdp0(self) -> float:
         """Derivada de `f` em relacao a `p0`, igual a `df/ds` do Cam-Clay.
@@ -257,9 +269,9 @@ class CamClayPlastico(Plastic):
         return -(Mc**2) * p
 
 
-##############################################################################################################
+########################################################################################
 # %%          Classe principal
-##############################################################################################################
+########################################################################################
 
 
 class CamClay(Material, CamClayPlastico, CamClayElastico, CamClayHardening):

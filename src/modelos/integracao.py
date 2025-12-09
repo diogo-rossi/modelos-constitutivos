@@ -11,7 +11,8 @@ def integra_deformacao(
 ) -> DataFrame:
     """Integra a deformacao no material, calculando as tensoes.
 
-    Retorna um `DataFrame` do `pandas` com cada linha representando um estágio de carregamento de deformação.
+    Retorna um `DataFrame` do `pandas` com cada linha representando um estágio de
+    carregamento de deformação.
 
     Ordem dos valores de retorno:
 

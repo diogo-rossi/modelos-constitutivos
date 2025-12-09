@@ -52,7 +52,8 @@ class Material(Plastic, Elastic, Hardening):
         sig += dsig
 
         # Atualiza estado de tensao e grava
-        self.update_state(sig)  # TODO: verificar se precisa fazer isso (isso atualiza a De).
+        self.update_state(sig)
+        # TODO: verificar se precisa fazer isso (isso atualiza a De).
 
         # Correcao plastica
         f: float = self.func_plastica()
@@ -74,7 +75,9 @@ class Material(Plastic, Elastic, Hardening):
         depsVE = depsV - depsVP
         depsQE = depsQ - depsQP
 
-        S3, S2, S1 = sorted([float(s) for s in np.linalg.eig(tensor(self.sigma)).eigenvalues])
+        S3, S2, S1 = sorted(
+            [float(s) for s in np.linalg.eig(tensor(self.sigma)).eigenvalues]
+        )
 
         return (
             vetor_para_linha(self.sigma)
