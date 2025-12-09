@@ -207,12 +207,30 @@ def add_plots(column: DeltaGenerator, df: DataFrame, material: Material, nP: int
     fig.update_yaxes(row=2, col=2, range=[0, S1max])
 
     S1 = np.array(df.S1).reshape(N, 1)
+    S2 = np.array(df.S3).reshape(N, 1)
     S3 = np.array(df.S3).reshape(N, 1)
-    R = (S1 - S3) / 2
-    C = (S1 + S3) / 2
-    S = S3 + (S1 - S3) * np.linspace(0, 1, nS)
-    T = np.sqrt(np.abs(R**2 - (S - C) ** 2))
-    fig.add_trace(row=2, col=2, trace=Scatter(x=S[n], y=T[n], showlegend=False, name="Circ. de Mohr"))
+    R12 = (S1 - S2) / 2
+    R13 = (S1 - S3) / 2
+    R23 = (S2 - S3) / 2
+    C12 = (S1 + S2) / 2
+    C13 = (S1 + S3) / 2
+    C23 = (S2 + S3) / 2
+    S12 = S2 + (S1 - S2) * np.linspace(0, 1, nS)
+    S13 = S3 + (S1 - S3) * np.linspace(0, 1, nS)
+    S23 = S3 + (S2 - S3) * np.linspace(0, 1, nS)
+    T12 = np.sqrt(np.abs(R12**2 - (S12 - C12) ** 2))
+    T13 = np.sqrt(np.abs(R13**2 - (S13 - C13) ** 2))
+    T23 = np.sqrt(np.abs(R23**2 - (S23 - C23) ** 2))
+    fig.add_trace(row=2, col=2, trace=Scatter(x=S12[n], y=T12[n], showlegend=True, name="Circ. 1"))
+    fig.add_trace(row=2, col=2, trace=Scatter(x=S13[n], y=T13[n], showlegend=True, name="Circ. 2"))
+    fig.add_trace(row=2, col=2, trace=Scatter(x=S23[n], y=T23[n], showlegend=True, name="Circ. 3"))
+
+    add_marker(fig, 2, 2, S12[n][0], 0)
+    add_marker(fig, 2, 2, S12[n][-1], 0)
+    add_marker(fig, 2, 2, S13[n][0], 0)
+    add_marker(fig, 2, 2, S13[n][-1], 0)
+    add_marker(fig, 2, 2, S23[n][0], 0)
+    add_marker(fig, 2, 2, S23[n][-1], 0)
 
     ##########################################################################################################
     # %           ADICIONA FIGURA
