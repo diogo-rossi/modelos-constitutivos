@@ -17,7 +17,6 @@ from modelos.funcs import vc
 from plotly.subplots import make_subplots
 from plotly.graph_objects import Scatter, Figure
 from streamlit.delta_generator import DeltaGenerator  # for typing
-from dataclasses import dataclass, asdict
 
 ########################################################################################
 # %%          CONFIGURACOES
