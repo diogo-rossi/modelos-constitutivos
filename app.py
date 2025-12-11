@@ -40,7 +40,7 @@ axes_dict: dict[str, Any] = dict(
     mirror="allticks", ticks="inside", showgrid=True, title_standoff=5
 )
 fig_dict: dict[str, Any] = dict(
-    height=800,
+    height=900,
     template="simple_white",
     plot_bgcolor="white",
     showlegend=True,
@@ -131,7 +131,7 @@ def add_plots(
     nS: int = 1000,
 ):
     N: int = len(df)
-    n = column.slider("Step", min_value=0, max_value=N - 1, value=0, step=1)
+    n = 0  # column.slider("Step", min_value=0, max_value=N - 1, value=0, step=1)
 
     fig = make_subplots(rows=2, cols=2, horizontal_spacing=0.05, vertical_spacing=0.07)
 
@@ -272,8 +272,80 @@ def add_plots(
     ####################################################################################
     # %           ADICIONA FIGURA
     ####################################################################################
+    steps = []
+    for i in range(N):
+        steps.append(
+            {
+                "label": str(i),
+                "method": "restyle",
+                "args": [
+                    {
+                        "x": [
+                            [df.p[i]],
+                            p[i],
+                            [df.p[i]],
+                            [df.Ex[i]],
+                            [df.Ex[i]],
+                            [df.Ex[i]],
+                            [df.Ey[i]],
+                            [df.Ey[i]],
+                            [df.Ey[i]],
+                            [df.Ez[i]],
+                            [df.Ez[i]],
+                            [df.Ez[i]],
+                            S12[i],
+                            S13[i],
+                            S23[i],
+                            [S12[i][0]],
+                            [S12[i][-1]],
+                            [S13[i][0]],
+                            [S13[i][-1]],
+                            [S23[i][0]],
+                            [S23[i][-1]],
+                        ],
+                        "y": [
+                            [df.e[i]],
+                            q[i],
+                            [df.q[i]],
+                            [df.Sx[i]],
+                            [df.Sy[i]],
+                            [df.Sz[i]],
+                            [df.Sx[i]],
+                            [df.Sy[i]],
+                            [df.Sz[i]],
+                            [df.Sx[i]],
+                            [df.Sy[i]],
+                            [df.Sz[i]],
+                            T12[i],
+                            T13[i],
+                            T23[i],
+                            [0],
+                            [0],
+                            [0],
+                            [0],
+                            [0],
+                            [0],
+                        ],
+                    },
+                    [1, 5, 6]
+                    + list(range(16, 25))  # update trace 0 (the animated curve)
+                    + list(range(26, 35)),  # update trace 0 (the animated curve)
+                ],
+            }
+        )
 
-    fig.update_layout(**fig_dict)
+    slider = [
+        {
+            "active": 0,
+            "steps": steps,
+            "currentvalue": {
+                "visible": True,
+                "prefix": "Step: ",
+            },
+        }
+    ]
+
+    fig.update_layout(sliders=slider, **fig_dict)
 
     tabs = column.tabs(["2D plot", "3D plot"])
 
