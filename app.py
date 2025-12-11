@@ -166,8 +166,8 @@ def add_plots(
     )
     fig.add_trace(
         row=1, col=1, trace=Scatter(x=df.p, y=df.e, showlegend=False, name="e vs lnP")
-    )
-    add_marker(fig, 1, 1, df.p[n], df.e[n])
+    )  # 0
+    add_marker(fig, 1, 1, df.p[n], df.e[n])  # 1
 
     ####################################################################################
     # %           P x Q
@@ -177,10 +177,10 @@ def add_plots(
     qEnv = material.Mc * pEnv
     fig.add_trace(
         row=1, col=2, trace=Scatter(x=df.p, y=df.q, showlegend=False, name="Trajetoria")
-    )
+    )  # 2
     fig.add_trace(
         row=1, col=2, trace=Scatter(x=pEnv, y=qEnv, showlegend=False, name="Envoltoria")
-    )
+    )  # 3
     fig.update_xaxes(row=1, col=2, range=[0, np.max(df.s)])
     fig.update_yaxes(row=1, col=2, range=[0, np.max(qEnv)])
 
@@ -192,39 +192,39 @@ def add_plots(
         row=1,
         col=2,
         trace=Scatter(x=p[0], y=q[0], showlegend=False, name="Sup-Plast-Ini"),
-    )
+    )  # 4
     fig.add_trace(
         row=1,
         col=2,
         trace=Scatter(x=p[n], y=q[n], showlegend=False, name="Sup. Plastif."),
-    )
+    )  # 5
 
-    add_marker(fig, 1, 2, df.p[n], df.q[n])
+    add_marker(fig, 1, 2, df.p[n], df.q[n])  # 6
 
     ####################################################################################
     # %           TENSAO x DEFORMACAO
     ####################################################################################
     S1max = np.max(df.S1)
     fig.update_yaxes(row=2, col=1, range=[0, S1max])
-    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ex, y=df.Sx, name="Sx-Ex"))
-    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ex, y=df.Sy, name="Sy-Ex"))
-    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ex, y=df.Sz, name="Sz-Ex"))
-    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ey, y=df.Sx, name="Sx-Ey"))
-    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ey, y=df.Sy, name="Sy-Ey"))
-    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ey, y=df.Sz, name="Sz-Ey"))
-    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ez, y=df.Sx, name="Sx-Ez"))
-    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ez, y=df.Sy, name="Sy-Ez"))
-    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ez, y=df.Sz, name="Sz-Ez"))
+    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ex, y=df.Sx, name="Sx-Ex"))  # 7
+    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ex, y=df.Sy, name="Sy-Ex"))  # 8
+    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ex, y=df.Sz, name="Sz-Ex"))  # 9
+    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ey, y=df.Sx, name="Sx-Ey"))  # 10
+    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ey, y=df.Sy, name="Sy-Ey"))  # 11
+    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ey, y=df.Sz, name="Sz-Ey"))  # 12
+    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ez, y=df.Sx, name="Sx-Ez"))  # 13
+    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ez, y=df.Sy, name="Sy-Ez"))  # 14
+    fig.add_trace(row=2, col=1, trace=Scatter(x=df.Ez, y=df.Sz, name="Sz-Ez"))  # 15
 
-    add_marker(fig, 2, 1, df.Ex[n], df.Sx[n])
-    add_marker(fig, 2, 1, df.Ex[n], df.Sy[n])
-    add_marker(fig, 2, 1, df.Ex[n], df.Sz[n])
-    add_marker(fig, 2, 1, df.Ey[n], df.Sx[n])
-    add_marker(fig, 2, 1, df.Ey[n], df.Sy[n])
-    add_marker(fig, 2, 1, df.Ey[n], df.Sz[n])
-    add_marker(fig, 2, 1, df.Ez[n], df.Sx[n])
-    add_marker(fig, 2, 1, df.Ez[n], df.Sy[n])
-    add_marker(fig, 2, 1, df.Ez[n], df.Sz[n])
+    add_marker(fig, 2, 1, df.Ex[n], df.Sx[n])  # 16
+    add_marker(fig, 2, 1, df.Ex[n], df.Sy[n])  # 17
+    add_marker(fig, 2, 1, df.Ex[n], df.Sz[n])  # 18
+    add_marker(fig, 2, 1, df.Ey[n], df.Sx[n])  # 19
+    add_marker(fig, 2, 1, df.Ey[n], df.Sy[n])  # 20
+    add_marker(fig, 2, 1, df.Ey[n], df.Sz[n])  # 21
+    add_marker(fig, 2, 1, df.Ez[n], df.Sx[n])  # 22
+    add_marker(fig, 2, 1, df.Ez[n], df.Sy[n])  # 23
+    add_marker(fig, 2, 1, df.Ez[n], df.Sz[n])  # 24
 
     ####################################################################################
     # %           SIGMA x TAU
@@ -234,7 +234,7 @@ def add_plots(
     tau = np.tan(material.phi) * sig
     fig.add_trace(
         row=2, col=2, trace=Scatter(x=sig, y=tau, showlegend=False, name="Envoltoria")
-    )
+    )  # 25
     fig.update_yaxes(row=2, col=2, range=[0, S1max])
 
     S1 = np.array(df.S1).reshape(N, 1)
@@ -254,20 +254,20 @@ def add_plots(
     T23 = np.sqrt(np.abs(R23**2 - (S23 - C23) ** 2))
     fig.add_trace(
         row=2, col=2, trace=Scatter(x=S12[n], y=T12[n], showlegend=True, name="Circ. 1")
-    )
+    )  # 26
     fig.add_trace(
         row=2, col=2, trace=Scatter(x=S13[n], y=T13[n], showlegend=True, name="Circ. 2")
-    )
+    )  # 27
     fig.add_trace(
         row=2, col=2, trace=Scatter(x=S23[n], y=T23[n], showlegend=True, name="Circ. 3")
-    )
+    )  # 28
 
-    add_marker(fig, 2, 2, S12[n][0], 0)
-    add_marker(fig, 2, 2, S12[n][-1], 0)
-    add_marker(fig, 2, 2, S13[n][0], 0)
-    add_marker(fig, 2, 2, S13[n][-1], 0)
-    add_marker(fig, 2, 2, S23[n][0], 0)
-    add_marker(fig, 2, 2, S23[n][-1], 0)
+    add_marker(fig, 2, 2, S12[n][0], 0)  # 29
+    add_marker(fig, 2, 2, S12[n][-1], 0)  # 30
+    add_marker(fig, 2, 2, S13[n][0], 0)  # 31
+    add_marker(fig, 2, 2, S13[n][-1], 0)  # 32
+    add_marker(fig, 2, 2, S23[n][0], 0)  # 33
+    add_marker(fig, 2, 2, S23[n][-1], 0)  # 34
 
     ####################################################################################
     # %           ADICIONA FIGURA
