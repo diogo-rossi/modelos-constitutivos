@@ -40,7 +40,7 @@ axes_dict: dict[str, Any] = dict(
     mirror="allticks", ticks="inside", showgrid=True, title_standoff=5
 )
 fig_dict: dict[str, Any] = dict(
-    height=900,
+    height=800,
     template="simple_white",
     plot_bgcolor="white",
     showlegend=True,
@@ -275,7 +275,9 @@ def add_plots(
 
     fig.update_layout(**fig_dict)
 
-    column.plotly_chart(fig, width="stretch", theme=None)
+    tabs = column.tabs(["2D plot", "3D plot"])
+
+    tabs[0].plotly_chart(fig, width="stretch", theme=None)
 
 
 def add_marker(fig: Figure, row: int, col: int, x: float, y: float):
