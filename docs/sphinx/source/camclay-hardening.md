@@ -5,6 +5,6 @@ Classe que implementa o modelo de endurecimento do Cam-Clay.
 ---
 
 ```{eval-rst}
-.. autoclass:: modelos.cam_clay.CamClayHardening
+.. autoclass:: modelos.cam_clay_hardening.CamClayHardening
     :members:
 ```

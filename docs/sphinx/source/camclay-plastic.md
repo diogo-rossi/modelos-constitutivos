@@ -5,6 +5,6 @@ Classe que implementa o modelo concreto de plasticidade do Cam-Clay.
 ---
 
 ```{eval-rst}
-.. autoclass:: modelos.cam_clay.CamClayPlastico
+.. autoclass:: modelos.cam_clay_plastic.CamClayPlastico
     :members:
 ```

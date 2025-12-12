@@ -5,6 +5,6 @@ Classe que implementa o modelo elástico do Cam-Clay.
 ---
 
 ```{eval-rst}
-.. autoclass:: modelos.cam_clay.CamClayElastico
+.. autoclass:: modelos.cam_clay_elastic.CamClayElastico
     :members:
 ```
