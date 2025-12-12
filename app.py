@@ -239,7 +239,7 @@ def add_plots(
     fig.update_yaxes(row=2, col=2, range=[0, S1max])
 
     S1 = np.array(df.S1).reshape(N, 1)
-    S2 = np.array(df.S3).reshape(N, 1)
+    S2 = np.array(df.S2).reshape(N, 1)
     S3 = np.array(df.S3).reshape(N, 1)
     R12 = (S1 - S2) / 2
     R13 = (S1 - S3) / 2
@@ -305,32 +305,31 @@ def add_plots(
                             [S23[i][-1]],
                         ],
                         "y": [
-                            [df.e[i]],
-                            q[i],
-                            [df.q[i]],
-                            [df.Sx[i]],
-                            [df.Sy[i]],
-                            [df.Sz[i]],
-                            [df.Sx[i]],
-                            [df.Sy[i]],
-                            [df.Sz[i]],
-                            [df.Sx[i]],
-                            [df.Sy[i]],
-                            [df.Sz[i]],
-                            T12[i],
-                            T13[i],
-                            T23[i],
-                            [0],
-                            [0],
-                            [0],
-                            [0],
-                            [0],
-                            [0],
+                            [df.e[i]],  # 1
+                            q[i],  # 5
+                            [df.q[i]],  # 6
+                            [df.Sx[i]],  # 16
+                            [df.Sy[i]],  # 17
+                            [df.Sz[i]],  # 18
+                            [df.Sx[i]],  # 19
+                            [df.Sy[i]],  # 20
+                            [df.Sz[i]],  # 21
+                            [df.Sx[i]],  # 22
+                            [df.Sy[i]],  # 23
+                            [df.Sz[i]],  # 24
+                            tau[i],  # 26
+                            T12[i],  # 27
+                            T13[i],  # 28
+                            T23[i],  # 29
+                            [0],  # 30
+                            [0],  # 31
+                            [0],  # 32
+                            [0],  # 33
+                            [0],  # 34
+                            [0],  # 35
                         ],
                     },
-                    [1, 5, 6]
-                    + list(range(16, 25))  # update trace 0 (the animated curve)
-                    + list(range(26, 35)),  # update trace 0 (the animated curve)
+                    [1, 5, 6] + list(range(16, 25)) + list(range(26, 36)),
                 ],
             }
         )
