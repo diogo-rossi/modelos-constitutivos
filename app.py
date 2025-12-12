@@ -118,6 +118,141 @@ modelos: dict[str, ParametrosClasse] = {
 }
 
 
+def add_marker(
+    fig: Figure,
+    row: int,
+    col: int,
+    x: float,
+    y: float,
+    name: str | None = None,
+    show=False,
+):
+    """Adiciona marcador do ensaio na curva"""
+    name = name or "Estado atual"
+    fig.add_trace(
+        row=row,
+        col=col,
+        trace=Scatter(
+            x=[x],
+            y=[y],
+            mode="markers",
+            name=name,
+            marker=dict(size=8, color="red"),
+            showlegend=show,
+        ),
+    )
+
+
+########################################################################################
+# %%          FUNCAO: CRIA A INTERFACE
+########################################################################################
+
+
+def setup_app(modelos: dict[str, ParametrosClasse]):
+
+    ####################################################################################
+    # %           COLUNAS, BOTAO DE FECHAR E MODELOS
+    ####################################################################################
+
+    left, right = st.columns([24, 100])
+    fechar, modelo = left.columns(2)
+    fechar.button("Close", on_click=sr.close_app)
+    modelo = modelo.selectbox(
+        "Modelo", [name for name in modelos], on_change=on_field_change
+    )
+
+    ####################################################################################
+    # %           PARAMETROS
+    ####################################################################################
+
+    parametros = modelos[modelo]["parametros"]
+
+    k = 2
+    for par in parametros:
+        k += 1
+        if k >= 2:
+            k = 0
+            cols = left.columns(2)
+        parametros[par]["valor"] = cols[k].number_input(
+            label=parametros[par]["nome"],
+            value=parametros[par]["valor"],
+            on_change=on_field_change,
+        )
+
+    ####################################################################################
+    # %           ESTADO INICIAL
+    ####################################################################################
+
+    left.text("Estado inicial")
+    k = 3
+    stress: list[float] = [10, 10, 10, 0, 0, 0]
+    var = ("sigma", "tau")
+    for i, s in enumerate(["x", "y", "z", "xy", "yz", "zx"]):
+        k += 1
+        if k >= 3:
+            k = 0
+            cols = left.columns(3)
+        stress[i] = cols[k].number_input(
+            f"$\\{var[0] if i<3 else var[1]}_{{{s}0}}$",
+            stress[i],
+            on_change=on_field_change,
+        )
+
+    ####################################################################################
+    # %           TIPO DE ENSAIOS E NUMERO DE STEPS
+    ####################################################################################
+
+    ensaio, steps = left.columns(2)
+    ensaio = ensaio.selectbox(
+        "Ensaio", ["Oedometrico", "Undrained"], on_change=on_field_change
+    )
+    steps = steps.number_input("Steps", value=500, on_change=on_field_change)
+
+    ####################################################################################
+    # %           INCREMENTOS
+    ####################################################################################
+
+    incrementos: list[float] = [0.0, 0.0001, 0.0, 0.0, 0.0, 0.0]
+    controle = left.selectbox(
+        "Controle", ["Deformacao", "Tensao"], on_change=on_field_change
+    )
+    var = ("sigma", "tau") if controle == "Tensao" else ("varepsilon", "gamma")
+    k = 3
+    for i, s in enumerate(["x", "y", "z", "xy", "yz", "zx"]):
+        k += 1
+        if k >= 3:
+            k = 0
+            cols = left.columns(3)
+        incrementos[i] = cols[k].number_input(
+            f"d$\\{var[0] if i<3 else var[1]}_{{{s}}}$",
+            value=incrementos[i],
+            format=("%.5f" if controle == "Deformacao" else "%.2f"),
+            on_change=on_field_change,
+        )
+
+    ####################################################################################
+    # %           DEFINICAO DO MODELO
+    ####################################################################################
+
+    with left:
+        with st.spinner("Running", show_time=True):
+
+            sig0 = vc(stress)
+            eps = vc([0, 0, 0, 0, 0, 0])
+            kwargs: dict[str, Any] = {k: parametros[k]["valor"] for k in parametros}
+            kwargs.update(sigma0=sig0, epsilon0=eps)
+            material = modelos[modelo]["classe"](**kwargs)
+
+            if st.session_state.get(RUN_MODEL, False):
+                st.session_state[DF] = integra_deformacao(
+                    deps=vc(incrementos), num_steps=steps, material=material
+                )
+                st.session_state[DF].to_csv("resultadoApp.csv")
+                st.session_state[RUN_MODEL] = False
+
+            add_plots(right, st.session_state[DF], material)
+
+
 ########################################################################################
 # %%          FUNCAO: ADICIONA PLOTS
 ########################################################################################
@@ -427,7 +562,7 @@ def add_plots(
     )
 
     frames = []
-    for i, (verts, faces) in enumerate(meshes[:50]+meshes[-50:]):
+    for i, (verts, faces) in enumerate(meshes[:50] + meshes[-50:]):
 
         frames.append(
             Frame(
@@ -448,7 +583,7 @@ def add_plots(
     fig3D.frames = frames
 
     steps = []
-    for i, h in enumerate(meshes[:50]+meshes[-50:]):
+    for i, h in enumerate(meshes[:50] + meshes[-50:]):
         step = {
             "label": f"h = {i}",
             "method": "animate",
@@ -515,141 +650,6 @@ def add_plots(
     #     ev = getattr(plot, "event_data")
     #     if isinstance(ev, dict) and "scene.camera" in ev:
     #         st.session_state["camera"] = ev["scene.camera"]
-
-
-def add_marker(
-    fig: Figure,
-    row: int,
-    col: int,
-    x: float,
-    y: float,
-    name: str | None = None,
-    show=False,
-):
-    """Adiciona marcador do ensaio na curva"""
-    name = name or "Estado atual"
-    fig.add_trace(
-        row=row,
-        col=col,
-        trace=Scatter(
-            x=[x],
-            y=[y],
-            mode="markers",
-            name=name,
-            marker=dict(size=8, color="red"),
-            showlegend=show,
-        ),
-    )
-
-
-########################################################################################
-# %%          FUNCAO: CRIA A INTERFACE
-########################################################################################
-
-
-def setup_app(modelos: dict[str, ParametrosClasse]):
-
-    ####################################################################################
-    # %           COLUNAS, BOTAO DE FECHAR E MODELOS
-    ####################################################################################
-
-    left, right = st.columns([24, 100])
-    fechar, modelo = left.columns(2)
-    fechar.button("Close", on_click=sr.close_app)
-    modelo = modelo.selectbox(
-        "Modelo", [name for name in modelos], on_change=on_field_change
-    )
-
-    ####################################################################################
-    # %           PARAMETROS
-    ####################################################################################
-
-    parametros = modelos[modelo]["parametros"]
-
-    k = 2
-    for par in parametros:
-        k += 1
-        if k >= 2:
-            k = 0
-            cols = left.columns(2)
-        parametros[par]["valor"] = cols[k].number_input(
-            label=parametros[par]["nome"],
-            value=parametros[par]["valor"],
-            on_change=on_field_change,
-        )
-
-    ####################################################################################
-    # %           ESTADO INICIAL
-    ####################################################################################
-
-    left.text("Estado inicial")
-    k = 3
-    stress: list[float] = [10, 10, 10, 0, 0, 0]
-    var = ("sigma", "tau")
-    for i, s in enumerate(["x", "y", "z", "xy", "yz", "zx"]):
-        k += 1
-        if k >= 3:
-            k = 0
-            cols = left.columns(3)
-        stress[i] = cols[k].number_input(
-            f"$\\{var[0] if i<3 else var[1]}_{{{s}0}}$",
-            stress[i],
-            on_change=on_field_change,
-        )
-
-    ####################################################################################
-    # %           TIPO DE ENSAIOS E NUMERO DE STEPS
-    ####################################################################################
-
-    ensaio, steps = left.columns(2)
-    ensaio = ensaio.selectbox(
-        "Ensaio", ["Oedometrico", "Undrained"], on_change=on_field_change
-    )
-    steps = steps.number_input("Steps", value=500, on_change=on_field_change)
-
-    ####################################################################################
-    # %           INCREMENTOS
-    ####################################################################################
-
-    incrementos: list[float] = [0.0, 0.0001, 0.0, 0.0, 0.0, 0.0]
-    controle = left.selectbox(
-        "Controle", ["Deformacao", "Tensao"], on_change=on_field_change
-    )
-    var = ("sigma", "tau") if controle == "Tensao" else ("varepsilon", "gamma")
-    k = 3
-    for i, s in enumerate(["x", "y", "z", "xy", "yz", "zx"]):
-        k += 1
-        if k >= 3:
-            k = 0
-            cols = left.columns(3)
-        incrementos[i] = cols[k].number_input(
-            f"d$\\{var[0] if i<3 else var[1]}_{{{s}}}$",
-            value=incrementos[i],
-            format=("%.5f" if controle == "Deformacao" else "%.2f"),
-            on_change=on_field_change,
-        )
-
-    ####################################################################################
-    # %           DEFINICAO DO MODELO
-    ####################################################################################
-
-    with left:
-        with st.spinner("Running", show_time=True):
-
-            sig0 = vc(stress)
-            eps = vc([0, 0, 0, 0, 0, 0])
-            kwargs: dict[str, Any] = {k: parametros[k]["valor"] for k in parametros}
-            kwargs.update(sigma0=sig0, epsilon0=eps)
-            material = modelos[modelo]["classe"](**kwargs)
-
-            if st.session_state.get(RUN_MODEL, False):
-                st.session_state[DF] = integra_deformacao(
-                    deps=vc(incrementos), num_steps=steps, material=material
-                )
-                st.session_state[DF].to_csv("resultadoApp.csv")
-                st.session_state[RUN_MODEL] = False
-
-            add_plots(right, st.session_state[DF], material)
 
 
 ########################################################################################
