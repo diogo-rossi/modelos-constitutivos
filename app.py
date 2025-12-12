@@ -459,20 +459,23 @@ def setup_app(modelos: dict[str, ParametrosClasse]):
     # %           DEFINICAO DO MODELO
     ####################################################################################
 
-    sig0 = vc(stress)
-    eps = vc([0, 0, 0, 0, 0, 0])
-    kwargs: dict[str, Any] = {k: parametros[k]["valor"] for k in parametros}
-    kwargs.update(sigma0=sig0, epsilon0=eps)
-    material = modelos[modelo]["classe"](**kwargs)
+    with left:
+        with st.spinner("Running", show_time=True):
 
-    if st.session_state.get(RUN_MODEL, False):
-        st.session_state[DF] = integra_deformacao(
-            deps=vc(incrementos), num_steps=steps, material=material
-        )
-        st.session_state[DF].to_csv("resultadoApp.csv")
-        st.session_state[RUN_MODEL] = False
+            sig0 = vc(stress)
+            eps = vc([0, 0, 0, 0, 0, 0])
+            kwargs: dict[str, Any] = {k: parametros[k]["valor"] for k in parametros}
+            kwargs.update(sigma0=sig0, epsilon0=eps)
+            material = modelos[modelo]["classe"](**kwargs)
 
-    add_plots(right, st.session_state[DF], material)
+            if st.session_state.get(RUN_MODEL, False):
+                st.session_state[DF] = integra_deformacao(
+                    deps=vc(incrementos), num_steps=steps, material=material
+                )
+                st.session_state[DF].to_csv("resultadoApp.csv")
+                st.session_state[RUN_MODEL] = False
+
+            add_plots(right, st.session_state[DF], material)
 
 
 ########################################################################################
