@@ -13,7 +13,7 @@ from typing import TypedDict, Any
 from modelos.material import Material
 from modelos.cam_clay import CamClay
 from modelos.integracao import integra_deformacao
-from modelos.funcs import vc
+from modelos.funcs import vc, desv, octa
 from plotly.subplots import make_subplots
 from plotly.graph_objects import Scatter, Figure
 from streamlit.delta_generator import DeltaGenerator  # for typing
@@ -231,8 +231,8 @@ def add_plots(
     # %           SIGMA x TAU
     ####################################################################################
 
-    Smax = np.array(df.s).reshape(N, 1)
-    sig = Smax * np.linspace(0, 1, nP)
+    p0 = np.array(df.s).reshape(N, 1)
+    sig = p0 * np.linspace(0, 1, nP)
     M = np.divide(q, p, out=np.zeros_like(p), where=(p > 0))
     M[M > material.Mc] = material.Mc
     phi = np.asin(3 * M / (6 + M))
@@ -249,8 +249,9 @@ def add_plots(
         trace=Scatter(x=sig[n], y=tau[n], showlegend=False, name="Envoltoria"),
     )  # 26
     Tmax = np.max(tau[~np.isnan(tau)])
+    Smax = np.max(tau[~np.isnan(sig)])
     fig.update_yaxes(row=2, col=2, range=[0, Tmax])
-    fig.update_xaxes(row=2, col=2, range=[0, np.max(Smax)])
+    fig.update_xaxes(row=2, col=2, range=[0, Smax])
 
     S1 = np.array(df.S1).reshape(N, 1)
     S2 = np.array(df.S2).reshape(N, 1)
