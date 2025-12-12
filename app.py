@@ -352,8 +352,17 @@ def add_plots(
     tabs[0].plotly_chart(fig, width="stretch", theme=None)
 
 
-def add_marker(fig: Figure, row: int, col: int, x: float, y: float):
+def add_marker(
+    fig: Figure,
+    row: int,
+    col: int,
+    x: float,
+    y: float,
+    name: str | None = None,
+    show=False,
+):
     """Adiciona marcador do ensaio na curva"""
+    name = name or "Estado atual"
     fig.add_trace(
         row=row,
         col=col,
@@ -361,9 +370,9 @@ def add_marker(fig: Figure, row: int, col: int, x: float, y: float):
             x=[x],
             y=[y],
             mode="markers",
-            name="Estado atual",
+            name=name,
             marker=dict(size=8, color="red"),
-            showlegend=False,
+            showlegend=show,
         ),
     )
 
