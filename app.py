@@ -69,7 +69,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-import streamlit as st
 
 st.markdown(
     """
