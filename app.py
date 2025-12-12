@@ -249,7 +249,7 @@ def add_plots(
         trace=Scatter(x=sig[n], y=tau[n], showlegend=False, name="Envoltoria"),
     )  # 26
     Tmax = np.max(tau[~np.isnan(tau)])
-    Smax = np.max(tau[~np.isnan(sig)])
+    Smax = np.max(sig[~np.isnan(sig)])
     fig.update_yaxes(row=2, col=2, range=[0, Tmax])
     fig.update_xaxes(row=2, col=2, range=[0, Smax])
 
