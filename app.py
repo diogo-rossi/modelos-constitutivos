@@ -172,15 +172,17 @@ def add_plots(
     # %           P x Q
     ####################################################################################
 
-    pEnv = np.linspace(0, np.max(df.s), 100)
+    p0max = np.max(df.s)
+    pEnv = np.linspace(0, p0max, 100)
     qEnv = material.Mc * pEnv
+
     fig.add_trace(
         row=1, col=2, trace=Scatter(x=df.p, y=df.q, showlegend=False, name="Trajetoria")
     )  # 2
     fig.add_trace(
         row=1, col=2, trace=Scatter(x=pEnv, y=qEnv, showlegend=False, name="Envoltoria")
     )  # 3
-    fig.update_xaxes(row=1, col=2, range=[0, np.max(df.s)])
+    fig.update_xaxes(row=1, col=2, range=[0, p0max])
     fig.update_yaxes(row=1, col=2, range=[0, np.max(qEnv)])
 
     p0 = np.array(df.s).reshape(N, 1)
