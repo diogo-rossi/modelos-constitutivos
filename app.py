@@ -255,20 +255,20 @@ def add_plots(
     T23 = np.sqrt(np.abs(R23**2 - (S23 - C23) ** 2))
     fig.add_trace(
         row=2, col=2, trace=Scatter(x=S12[n], y=T12[n], showlegend=True, name="Circ. 1")
-    )  # 26
-    fig.add_trace(
-        row=2, col=2, trace=Scatter(x=S13[n], y=T13[n], showlegend=True, name="Circ. 2")
     )  # 27
     fig.add_trace(
-        row=2, col=2, trace=Scatter(x=S23[n], y=T23[n], showlegend=True, name="Circ. 3")
+        row=2, col=2, trace=Scatter(x=S13[n], y=T13[n], showlegend=True, name="Circ. 2")
     )  # 28
+    fig.add_trace(
+        row=2, col=2, trace=Scatter(x=S23[n], y=T23[n], showlegend=True, name="Circ. 3")
+    )  # 29
 
-    add_marker(fig, 2, 2, S12[n][0], 0)  # 29
-    add_marker(fig, 2, 2, S12[n][-1], 0)  # 30
-    add_marker(fig, 2, 2, S13[n][0], 0)  # 31
-    add_marker(fig, 2, 2, S13[n][-1], 0)  # 32
-    add_marker(fig, 2, 2, S23[n][0], 0)  # 33
-    add_marker(fig, 2, 2, S23[n][-1], 0)  # 34
+    add_marker(fig, 2, 2, S12[n][0], 0)  # 30
+    add_marker(fig, 2, 2, S12[n][-1], 0)  # 31
+    add_marker(fig, 2, 2, S13[n][0], 0)  # 32
+    add_marker(fig, 2, 2, S13[n][-1], 0)  # 33
+    add_marker(fig, 2, 2, S23[n][0], 0)  # 34
+    add_marker(fig, 2, 2, S23[n][-1], 0)  # 35
 
     ####################################################################################
     # %           ADICIONA FIGURA
