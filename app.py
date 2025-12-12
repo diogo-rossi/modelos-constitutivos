@@ -231,12 +231,26 @@ def add_plots(
     # %           SIGMA x TAU
     ####################################################################################
 
-    sig = np.linspace(0, S1max, 100)
-    tau = np.tan(material.phi) * sig
+    Smax = np.array(df.s).reshape(N, 1)
+    sig = Smax * np.linspace(0, 1, nP)
+    M = np.divide(q, p, out=np.zeros_like(p), where=(p > 0))
+    M[M > material.Mc] = material.Mc
+    phi = np.asin(3 * M / (6 + M))
+    mi = np.tan(phi)
+    tau = mi * sig
     fig.add_trace(
-        row=2, col=2, trace=Scatter(x=sig, y=tau, showlegend=False, name="Envoltoria")
+        row=2,
+        col=2,
+        trace=Scatter(x=sig[0], y=tau[0], showlegend=False, name="Envoltoria"),
     )  # 25
-    fig.update_yaxes(row=2, col=2, range=[0, S1max])
+    fig.add_trace(
+        row=2,
+        col=2,
+        trace=Scatter(x=sig[n], y=tau[n], showlegend=False, name="Envoltoria"),
+    )  # 26
+    Tmax = np.max(tau[~np.isnan(tau)])
+    fig.update_yaxes(row=2, col=2, range=[0, Tmax])
+    fig.update_xaxes(row=2, col=2, range=[0, np.max(Smax)])
 
     S1 = np.array(df.S1).reshape(N, 1)
     S2 = np.array(df.S2).reshape(N, 1)
