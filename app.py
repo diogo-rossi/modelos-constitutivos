@@ -15,8 +15,9 @@ from modelos.cam_clay import CamClay
 from modelos.integracao import integra_deformacao
 from modelos.funcs import vc, desv, octa
 from plotly.subplots import make_subplots
-from plotly.graph_objects import Scatter, Figure
+from plotly.graph_objects import Scatter, Figure, Mesh3d, Scatter3d, Frame
 from streamlit.delta_generator import DeltaGenerator  # for typing
+from skimage.measure import marching_cubes
 
 ########################################################################################
 # %%          CONFIGURACOES
@@ -366,6 +367,154 @@ def add_plots(
     tabs = column.tabs(["2D plot", "3D plot"])
 
     tabs[0].plotly_chart(fig, width="stretch", theme=None)
+
+    s = np.linspace(0, Smax, 120)
+    s1, s2, s3 = np.meshgrid(s, s, s, indexing="ij")
+    f = np.array(
+        material.func_plastica(
+            s1[..., None], s2[..., None], s3[..., None], p0.reshape(1, 1, 1, N)
+        )
+    )
+    print(f.shape)
+    fig3D = make_subplots(
+        rows=1,
+        cols=2,
+        horizontal_spacing=0.05,
+        vertical_spacing=0.07,
+        specs=[[{"type": "scene"}, {"type": "scene"}]],
+    )
+
+    meshes = []
+    for i in range(f.shape[3]):
+        verts, faces, _, _ = marching_cubes(f[..., i], level=0.0)
+        meshes.append((verts, faces))
+
+    verts, faces = meshes[0]
+
+    fig3D.add_trace(
+        row=1,
+        col=1,
+        # trace=(
+        #     x=s2.ravel(),
+        #     y=s3.ravel(),
+        #     z=s1.ravel(),
+        #     value=f[0].ravel(),
+        #     isomin=0,
+        #     isomax=0,
+        #     surface_count=1,
+        #     caps=dict(x_show=False, y_show=False, z_show=False),
+        #     opacity=0.7,
+        #     showscale=False,
+        #     hovertemplate="x=%{x}<br>y=%{y}<br>z=%{z}<extra></extra>",
+        # ),
+        trace=Mesh3d(
+            x=verts[:, 0],
+            y=verts[:, 1],
+            z=verts[:, 2],
+            i=faces[:, 0],
+            j=faces[:, 1],
+            k=faces[:, 2],
+            color="lightblue",
+            opacity=0.6,
+        ),
+    )
+
+    fig3D.add_trace(Scatter3d(x=s, y=s, z=s, mode="lines", line=dict(width=3)))
+    fig3D.add_trace(
+        Scatter3d(
+            x=S2.ravel(), y=S3.ravel(), z=S1.ravel(), mode="lines", line=dict(width=3)
+        )
+    )
+
+    frames = []
+    for i, (verts, faces) in enumerate(meshes[:50]+meshes[-50:]):
+
+        frames.append(
+            Frame(
+                name=str(i),
+                data=[
+                    Mesh3d(
+                        x=verts[:, 0],
+                        y=verts[:, 1],
+                        z=verts[:, 2],
+                        i=faces[:, 0],
+                        j=faces[:, 1],
+                        k=faces[:, 2],
+                    )
+                ],
+            )
+        )
+
+    fig3D.frames = frames
+
+    steps = []
+    for i, h in enumerate(meshes[:50]+meshes[-50:]):
+        step = {
+            "label": f"h = {i}",
+            "method": "animate",
+            "args": [
+                [str(i)],  # frame name to animate to
+                {
+                    "frame": {"duration": 0, "redraw": True},
+                    "transition": {"duration": 0},
+                },
+            ],
+        }
+
+        # step = {
+        #     "method": "restyle",
+        #     "label": f"h = {i}",
+        #     "args": [
+        #         {
+        #             "x": [verts[:, 0]],
+        #             "y": [verts[:, 1]],
+        #             "z": [verts[:, 2]],
+        #             "i": [faces[:, 0]],
+        #             "j": [faces[:, 1]],
+        #             "k": [faces[:, 2]],
+        #         },
+        #         [0],  # <-- apply restyle to trace 0
+        #     ],
+        # }
+
+        steps.append(step)
+
+    slider = [
+        {
+            "active": 0,
+            "steps": steps,
+            "currentvalue": {
+                "visible": True,
+                "prefix": "Step: ",
+            },
+        }
+    ]
+
+    fig3D.update_layout(
+        height=900,
+        margin=dict(l=50, r=0, t=30, b=0),
+        scene=dict(
+            xaxis=dict(range=[0, 200]),
+            yaxis=dict(range=[0, 200]),
+            zaxis=dict(range=[0, 200]),
+        ),
+        scene_camera=dict(eye=dict(x=3.0, y=1.5, z=1.5)),  # camera position
+        sliders=slider,
+    )
+
+    # if "camera" in st.session_state:
+    #     fig3D.update_layout(scene_camera=st.session_state["camera"])
+
+    # # template = ("simple_white",)
+    # # plot_bgcolor = ("white",)
+    # # showlegend = (True,)
+
+    plot = tabs[1].plotly_chart(fig3D, width="stretch", theme=None)
+    # # Capture camera on any user rotation/pan/zoom
+    # if plot and hasattr(plot, "event_data"):
+    #     ev = getattr(plot, "event_data")
+    #     if isinstance(ev, dict) and "scene.camera" in ev:
+    #         st.session_state["camera"] = ev["scene.camera"]
 
 
 def add_marker(
