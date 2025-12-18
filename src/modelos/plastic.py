@@ -27,7 +27,7 @@ class Plastic(Elastic, Hardening, ABC):
         return 6 * np.sin(self.phi) / (3 - np.sin(self.phi))
 
     @abstractmethod
-    def func_plastica(self) -> float:
+    def func_plastica(self, *args) -> float:
         """Calcula e retorna o valor da funcao de plastificacao (`f`) em termos do
         estado de tensao.
 
