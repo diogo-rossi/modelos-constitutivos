@@ -14,11 +14,13 @@ dependencies = [
     "plotly>=6.5.0",
     "pyautogui>=0.9.54",
     "pygetwindow>=0.0.9",
+    "scikit-image>=0.25.2",
     "sphinx>=8.2.3",
     "sphinx-copybutton>=0.5.2",
     "sphinxnotes-comboroles>=1.0",
     "streamlit>=1.52.0",
     "taskipy>=1.14.1",
+    "tqdm>=4.67.1",
 ]
 
 [tool.taskipy.tasks]
