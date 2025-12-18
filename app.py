@@ -422,7 +422,7 @@ def add_plots(
     add_marker(fig, 2, 2, S23[n][-1], 0)  # 35
 
     ####################################################################################
-    # %           ADICIONA FIGURA
+    # %           ADICIONA STEPS FIGURA 2D
     ####################################################################################
     steps = []
     for i in range(N):
@@ -486,6 +486,10 @@ def add_plots(
             }
         )
 
+    ####################################################################################
+    # %           DEFINE SLIDER E FIGURA 2D
+    ####################################################################################
+
     slider = [
         {
             "active": 0,
@@ -503,14 +507,10 @@ def add_plots(
 
     tabs[0].plotly_chart(fig, width="stretch", theme=None)
 
-    s = np.linspace(0, Smax, 120)
-    s1, s2, s3 = np.meshgrid(s, s, s, indexing="ij")
-    f = np.array(
-        material.func_plastica(
-            s1[..., None], s2[..., None], s3[..., None], p0.reshape(1, 1, 1, N)
-        )
-    )
-    print(f.shape)
+    ####################################################################################
+    # %           PLOT 3D
+    ####################################################################################
+
     fig3D = make_subplots(
         rows=1,
         cols=2,
@@ -519,12 +519,27 @@ def add_plots(
         specs=[[{"type": "scene"}, {"type": "scene"}]],
     )
 
-    meshes = []
-    for i in range(f.shape[3]):
-        verts, faces, _, _ = marching_cubes(f[..., i], level=0.0)
-        meshes.append((verts, faces))
+    s = np.linspace(0, Smax, 120)
+    if "meshes" in st.session_state:
+        meshes = st.session_state["meshes"]
+        print("hello")
+    else:
+            
+        s1, s2, s3 = np.meshgrid(s, s, s, indexing="ij")
+        f = np.array(
+            material.func_plastica(
+                s1[..., None], s2[..., None], s3[..., None], p0.reshape(1, 1, 1, N)
+            )
+        )
+        
+        meshes = []
+        for i in range(f.shape[3]):
+            verts, faces, _, _ = marching_cubes(f[..., i], level=0.0)
+            meshes.append((verts, faces))
+        st.session_state["meshes"] = meshes
 
-    verts, faces = meshes[0]
+    n = tabs[1].slider("step", 0, N)
+    verts, faces = meshes[n]
 
     fig3D.add_trace(
         row=1,
@@ -561,69 +576,69 @@ def add_plots(
         )
     )
 
-    frames = []
-    for i, (verts, faces) in enumerate(meshes[:50] + meshes[-50:]):
+    # frames = []
+    # for i, (verts, faces) in enumerate(meshes[:50] + meshes[-50:]):
 
-        frames.append(
-            Frame(
-                name=str(i),
-                data=[
-                    Mesh3d(
-                        x=verts[:, 0],
-                        y=verts[:, 1],
-                        z=verts[:, 2],
-                        i=faces[:, 0],
-                        j=faces[:, 1],
-                        k=faces[:, 2],
-                    )
-                ],
-            )
-        )
+    #     frames.append(
+    #         Frame(
+    #             name=str(i),
+    #             data=[
+    #                 Mesh3d(
+    #                     x=verts[:, 0],
+    #                     y=verts[:, 1],
+    #                     z=verts[:, 2],
+    #                     i=faces[:, 0],
+    #                     j=faces[:, 1],
+    #                     k=faces[:, 2],
+    #                 )
+    #             ],
+    #         )
+    #     )
 
-    fig3D.frames = frames
+    # fig3D.frames = frames
 
-    steps = []
-    for i, h in enumerate(meshes[:50] + meshes[-50:]):
-        step = {
-            "label": f"h = {i}",
-            "method": "animate",
-            "args": [
-                [str(i)],  # frame name to animate to
-                {
-                    "frame": {"duration": 0, "redraw": True},
-                    "transition": {"duration": 0},
-                },
-            ],
-        }
+    # steps = []
+    # for i, h in enumerate(meshes[:50] + meshes[-50:]):
+    #     step = {
+    #         "label": f"h = {i}",
+    #         "method": "animate",
+    #         "args": [
+    #             [str(i)],  # frame name to animate to
+    #             {
+    #                 "frame": {"duration": 0, "redraw": True},
+    #                 "transition": {"duration": 0},
+    #             },
+    #         ],
+    #     }
 
-        # step = {
-        #     "method": "restyle",
-        #     "label": f"h = {i}",
-        #     "args": [
-        #         {
-        #             "x": [verts[:, 0]],
-        #             "y": [verts[:, 1]],
-        #             "z": [verts[:, 2]],
-        #             "i": [faces[:, 0]],
-        #             "j": [faces[:, 1]],
-        #             "k": [faces[:, 2]],
-        #         },
-        #         [0],  # <-- apply restyle to trace 0
-        #     ],
-        # }
+    # step = {
+    #     "method": "restyle",
+    #     "label": f"h = {i}",
+    #     "args": [
+    #         {
+    #             "x": [verts[:, 0]],
+    #             "y": [verts[:, 1]],
+    #             "z": [verts[:, 2]],
+    #             "i": [faces[:, 0]],
+    #             "j": [faces[:, 1]],
+    #             "k": [faces[:, 2]],
+    #         },
+    #         [0],  # <-- apply restyle to trace 0
+    #     ],
+    # }
 
-        steps.append(step)
+    # steps.append(step)
 
-    slider = [
-        {
-            "active": 0,
-            "steps": steps,
-            "currentvalue": {
-                "visible": True,
-                "prefix": "Step: ",
-            },
-        }
-    ]
+    # slider = [
+    #     {
+    #         "active": 0,
+    #         "steps": steps,
+    #         "currentvalue": {
+    #             "visible": True,
+    #             "prefix": "Step: ",
+    #         },
+    #     }
+    # ]
 
     fig3D.update_layout(
         height=900,
@@ -633,12 +648,16 @@ def add_plots(
             yaxis=dict(range=[0, 200]),
             zaxis=dict(range=[0, 200]),
         ),
-        scene_camera=dict(eye=dict(x=3.0, y=1.5, z=1.5)),  # camera position
-        sliders=slider,
+        # scene_camera=dict(eye=dict(x=3.0, y=1.5, z=1.5)),  # camera position
+        # sliders=slider,
     )
 
-    # if "camera" in st.session_state:
-    #     fig3D.update_layout(scene_camera=st.session_state["camera"])
+    if "camera" in st.session_state:
+        print("foi")
+        fig3D.update_layout(scene_camera=st.session_state["camera"])
+    else:
+        print("nao foi")
+        
 
     # # template = ("simple_white",)
     # # plot_bgcolor = ("white",)
@@ -646,10 +665,10 @@ def add_plots(
 
     plot = tabs[1].plotly_chart(fig3D, width="stretch", theme=None)
     # # Capture camera on any user rotation/pan/zoom
-    # if plot and hasattr(plot, "event_data"):
-    #     ev = getattr(plot, "event_data")
-    #     if isinstance(ev, dict) and "scene.camera" in ev:
-    #         st.session_state["camera"] = ev["scene.camera"]
+    if plot and hasattr(plot, "event_data"):
+        ev = plot.event_data
+        if isinstance(ev, dict) and "scene.camera" in ev:
+            st.session_state["camera"] = ev["scene.camera"]
 
 
 ########################################################################################
