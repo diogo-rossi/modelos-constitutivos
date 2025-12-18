@@ -32,7 +32,7 @@ class CamClayPlastico(Plastic):
     # %:          Metodos re-implementados
     ####################################################################################
 
-    def func_plastica(self) -> float:
+    def func_plastica(self, *args) -> float:
         """Calcula e retorna o valor da funcao de plastificacao (`f`) em termos do
         estado de tensao.
 
@@ -40,7 +40,13 @@ class CamClayPlastico(Plastic):
 
         .. figure:: images/f_cc.png
         """
-        Mc, p, q, p0 = self.Mc, self.p, self.q, self.s
+        Mc = self.Mc
+        if args:
+            s1, s2, s3, p0 = args
+            p = (s1 + s2 + s3) / 3
+            q = np.sqrt(0.5 * ((s1 - s2) ** 2 + (s2 - s3) ** 2 + (s3 - s1) ** 2))
+        else:
+            p, q, p0 = self.p, self.q, self.s
         return (Mc**2) * (p**2) - (Mc**2) * p0 * p + q**2
 
     def grad_f(self) -> Vetor6x1:
