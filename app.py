@@ -526,7 +526,10 @@ def add_plots(
 
     nHW = 50
 
-    s = np.linspace(0, Smax, nHW)
+    smin = Smax / 2
+    Smin = smin - smin * np.sqrt(3)
+    Smax *= np.sqrt(3)
+    s = np.linspace(Smin, Smax, nHW)
     if "meshes" in st.session_state:
         meshes = st.session_state["meshes"]
     else:
@@ -563,7 +566,21 @@ def add_plots(
             k=faces[:, 2],
             color="lightblue",
             opacity=0.6,
+            name="Superficie",
         ),
+    )
+
+    # ------------------------------- Ponto inicial
+
+    fig3D.add_trace(
+        Scatter3d(
+            x=S2.ravel()[0:1],
+            y=S3.ravel()[0:1],
+            z=S1.ravel()[0:1],
+            mode="markers",
+            marker=dict(size=6, color="red"),
+            name="Estado atual",
+        )
     )
 
     # ------------------------------- Eixo hidrostatico
@@ -574,8 +591,9 @@ def add_plots(
             y=s,
             z=s,
             mode="lines",
-            line=dict(width=3),
-        )
+            name="Eixo hidrostatico",
+            line=dict(color="black"),
+        ),
     )
 
     # ------------------------------- Trajetoria
@@ -586,7 +604,7 @@ def add_plots(
             y=S3.ravel(),
             z=S1.ravel(),
             mode="lines",
-            line=dict(width=3),
+            name="Trajetoria",
         )
     )
 
@@ -606,7 +624,14 @@ def add_plots(
                         i=faces[:, 0],
                         j=faces[:, 1],
                         k=faces[:, 2],
-                    )
+                    ),
+                    Scatter3d(
+                        x=S2.ravel()[i : i + 1],
+                        y=S3.ravel()[i : i + 1],
+                        z=S1.ravel()[i : i + 1],
+                        mode="markers",
+                        marker=dict(size=6, color="red"),
+                    ),
                 ],
             )
         )
@@ -628,15 +653,51 @@ def add_plots(
 
     slider = [{"steps": steps}]
 
+    # Eixo X
+    fig3D.add_trace(
+        Scatter3d(
+            x=[-50, Smax],
+            y=[0, 0],
+            z=[0, 0],
+            mode="lines",
+            name="Eixo X",
+        )
+    )
+
+    # Eixo Y
+    fig3D.add_trace(
+        Scatter3d(
+            x=[0, 0],
+            y=[-50, Smax],
+            z=[0, 0],
+            mode="lines",
+            name="Eixo Y",
+        )
+    )
+
+    # Eixo Z
+    fig3D.add_trace(
+        Scatter3d(
+            x=[0, 0],
+            y=[0, 0],
+            z=[-50, Smax],
+            mode="lines",
+            name="Eixo Z",
+        )
+    )
+
     fig3D.update_layout(
         height=900,
         margin=dict(l=50, r=0, t=30, b=0),
         scene=dict(
-            xaxis=dict(range=[0, 200]),
-            yaxis=dict(range=[0, 200]),
-            zaxis=dict(range=[0, 200]),
+            xaxis=dict(range=[Smin, Smax], title="σ<sub>2</sub>"),
+            yaxis=dict(range=[Smin, Smax], title="σ<sub>3</sub>"),
+            zaxis=dict(range=[Smin, Smax], title="σ<sub>1</sub>"),
         ),
         sliders=slider,
+        scene_camera={
+            "eye": {"x": 2.5, "y": 0.2, "z": 0.1},
+        },
     )
 
     tabs[1].plotly_chart(fig3D, width="stretch", theme=None)
