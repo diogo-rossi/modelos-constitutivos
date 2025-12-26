@@ -706,7 +706,8 @@ def add_plots(
             y=df.e,
             z=np.zeros(df.e.shape),
             showlegend=True,
-            name="e vs lnP",
+            name="p vs e",
+            mode="lines",
         ),
     )  # 0
 
