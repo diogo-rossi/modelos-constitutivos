@@ -802,20 +802,25 @@ def add_plots(
     fig3D.update_layout(
         height=900,
         margin=dict(l=50, r=0, t=30, b=0),
+        sliders=slider,
         scene=dict(
             xaxis=dict(range=[Smin, Smax], title="σ<sub>2</sub>"),
             yaxis=dict(range=[Smin, Smax], title="σ<sub>3</sub>"),
             zaxis=dict(range=[Smin, Smax], title="σ<sub>1</sub>"),
         ),
-        sliders=slider,
         scene_camera={
             "eye": {"x": 2.5, "y": 0.2, "z": 0.1},
         },
         scene2=dict(
-            xaxis_title="p (kPa)",
-            yaxis_title="e",
-            zaxis_title="q (kPa)",
+            xaxis=dict(range=[0, np.max(df.s)], title="p (kPa)"),
+            yaxis=dict(range=[np.min(df.e), np.max(df.e)], title="e"),
+            zaxis=dict(
+                range=[0, np.ceil(material.Mc * np.max(df.s) / 2)], title="q (kPa)"
+            ),
         ),
+        scene2_camera={
+            "eye": {"x": 2.0, "y": 2.0, "z": 2.0},
+        },
     )
 
     tabs[1].plotly_chart(fig3D, width="stretch", theme=None)
