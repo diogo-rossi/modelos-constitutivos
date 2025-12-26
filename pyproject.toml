@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "modelos-constitutivos"
 version = "0.0.0"
@@ -18,9 +22,13 @@ dependencies = [
     "sphinx>=8.2.3",
     "sphinx-copybutton>=0.5.2",
     "sphinxnotes-comboroles>=1.0",
+    "streamlit-plotly-events>=0.0.6",
     "streamlit>=1.52.0",
     "taskipy>=1.14.1",
     "tqdm>=4.67.1",
+    "dash>=3.3.0",
+    "pywebview>=6.1",
+    "dash-bootstrap-components>=2.0.4",
 ]
 
 [tool.taskipy.tasks]
