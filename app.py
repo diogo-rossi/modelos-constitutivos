@@ -253,6 +253,9 @@ def setup_app(modelos: dict[str, ParametrosClasse]):
                 st.session_state[DF].to_csv("resultadoApp.csv")
                 st.session_state[RUN_MODEL] = False
 
+                if "meshes" in st.session_state:
+                    st.session_state.pop("meshes")
+
             add_plots(right, st.session_state[DF], material)
 
 
@@ -567,6 +570,7 @@ def add_plots(
             color="lightblue",
             opacity=0.6,
             name="Superficie",
+            showlegend=True,
         ),
     )
 
