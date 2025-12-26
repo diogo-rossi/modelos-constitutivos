@@ -563,7 +563,7 @@ def add_plots(
     p0 = np.array(df.s).reshape(N, 1)
     p = np.linspace(0, np.max(p0), npqe)
     q = np.linspace(0, material.Mc * np.max(p0) / 2, npqe)
-    e = np.linspace(0, 1, npqe)
+    e = np.linspace(np.min(df.e), np.max(df.e), npqe)
 
     if "meshesE" in st.session_state:
         meshesE = st.session_state["meshesE"]
