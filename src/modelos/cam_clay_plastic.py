@@ -10,6 +10,10 @@ class CamClayPlastico(Plastic):
     s: float
     p: float
     q: float
+    e: float
+    p0: float
+    k: float
+    L: float
     sigma: Vetor6x1
 
     def __init__(self, Mc: float, p0: float) -> None:
@@ -42,9 +46,14 @@ class CamClayPlastico(Plastic):
         """
         Mc = self.Mc
         if args:
-            s1, s2, s3, p0 = args
-            p = (s1 + s2 + s3) / 3
-            q = np.sqrt(0.5 * ((s1 - s2) ** 2 + (s2 - s3) ** 2 + (s3 - s1) ** 2))
+            if len(args) == 4:
+                s1, s2, s3, p0 = args
+                p = (s1 + s2 + s3) / 3
+                q = np.sqrt(0.5 * ((s1 - s2) ** 2 + (s2 - s3) ** 2 + (s3 - s1) ** 2))
+            else:
+                e0, k, L, p00 = self.e, self.k, self.L, self.p0
+                p, q, e = args
+                p0 = p00 * np.exp((e0 - k * np.log(p00 / 10) - e) / L)
         else:
             p, q, p0 = self.p, self.q, self.s
         return (Mc**2) * (p**2) - (Mc**2) * p0 * p + q**2

@@ -1,6 +1,6 @@
 import streamlitrunner as sr
 
-sr.run()
+sr.run(title="Modelos constitutivos")
 
 ########################################################################################
 # %%          IMPORTS
@@ -553,6 +553,32 @@ def add_plots(
             meshes.append((verts, faces))
         st.session_state["meshes"] = meshes
 
+    # ------------------------------- Gera malha no segundo grafico
+
+    npqe = 50
+    p0 = np.array(df.s).reshape(N, 1)
+    p = np.linspace(0, np.max(p0), npqe)
+    q = np.linspace(0, material.Mc * np.max(p0) / 2, npqe)
+    e = np.linspace(0, 1, npqe)
+
+    if "meshesE" in st.session_state:
+        meshesE = st.session_state["meshesE"]
+    else:
+
+        pp, qq, ee = np.meshgrid(p, q, e, indexing="ij")
+        fe = np.array(
+            material.func_plastica(pp[..., None], qq[..., None], ee[..., None])
+        )
+
+        meshesE = []
+        for i in tqdm(range(fe.shape[3])):
+            verts, faces, _, _ = marching_cubes(fe[..., i], level=0.0)
+            verts[:, 0] = p[0] + verts[:, 0] * (p[-1] - p[0]) / (npqe - 1)
+            verts[:, 1] = e[0] + verts[:, 1] * (e[-1] - e[0]) / (npqe - 1)
+            verts[:, 2] = q[0] + verts[:, 2] * (q[-1] - q[0]) / (npqe - 1)
+            meshesE.append((verts, faces))
+        st.session_state["meshesE"] = meshesE
+
     # ------------------------------- Superficie inicial
 
     verts, faces = meshes[0]
@@ -611,6 +637,38 @@ def add_plots(
             name="Trajetoria",
         )
     )
+
+    # ------------------------------- Segunda Superficie inicial
+
+    verts, faces = meshesE[0]
+
+    fig3D.add_trace(
+        row=1,
+        col=2,
+        trace=Mesh3d(
+            x=verts[:, 0],
+            y=verts[:, 1],
+            z=verts[:, 2],
+            i=faces[:, 0],
+            j=faces[:, 1],
+            k=faces[:, 2],
+            color="lightblue",
+            opacity=0.6,
+            name="Superficie",
+        ),
+    )
+
+    fig3D.add_trace(
+        row=1,
+        col=2,
+        trace=Scatter3d(
+            x=df.p,
+            y=df.e,
+            z=np.zeros(df.e.shape),
+            showlegend=True,
+            name="e vs lnP",
+        ),
+    )  # 0
 
     # ------------------------------- Frames
 
@@ -702,6 +760,11 @@ def add_plots(
         scene_camera={
             "eye": {"x": 2.5, "y": 0.2, "z": 0.1},
         },
+        scene2=dict(
+            xaxis_title="p (kPa)",
+            yaxis_title="e",
+            zaxis_title="q (kPa)",
+        ),
     )
 
     tabs[1].plotly_chart(fig3D, width="stretch", theme=None)
