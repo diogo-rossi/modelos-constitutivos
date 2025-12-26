@@ -1,15 +1,41 @@
 import os
 import sys
-import warnings
 from pathlib import Path
 from typing import Literal, TypedDict, overload
 
-import psutil
-import pyautogui
-import pygetwindow
+import subprocess
 import webview
+import psutil
+import socket
 from streamlit import session_state
 from streamlit.runtime.scriptrunner import get_script_run_ctx
+
+
+def get_free_port() -> int:
+    """Returns the number of a free port"""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(("localhost", 0))
+    port = sock.getsockname()[1]
+    sock.close()
+    return port
+
+
+def is_port_in_use(port) -> bool:
+    """Checks if given port is used"""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(("localhost", port)) == 0
+
+
+def kill_streamlit(proc):
+    """Kill given streamlit process"""
+    try:
+        process = psutil.Process(proc.pid)
+        for child in process.children(recursive=True):
+            child.kill()
+        process.kill()
+        print("App closed")
+    except:
+        raise
 
 
 class SessionState:
@@ -111,18 +137,14 @@ for key in rc:
         rc[key] = os.environ[key]
 
 
-def close_app():
-    pyautogui.hotkey("alt", "f4")
-    psutil.Process(os.getpid()).terminate()
-
-
 @overload
 def run(
     *,
+    title: str = "Streamlit runner app",
+    maximized: bool = True,
     open_as_app: bool = True,
-    browser: Literal["chrome", "msedge"] = "msedge",
-    close_opened_window: bool = True,
     print_command: bool = True,
+    fill_page_content: bool = False,
     **kwargs,
 ): ...
 
@@ -142,46 +164,43 @@ def run(
 
     Parameters
     ----------
-        - `open_as_app` (`bool`, optional): Defaults to `True`.
+    - `title` (`str`, optional): Defaults to `"Streamlit runner app"`.
+        The title of the new window.
 
-            Whether to open the chromium based browser launching the url in "application mode" with `--app=` argument (separate window).
-            If `True`, the option `STREAMLIT_SERVER_HEADLESS` is set to `True`.
+    - `maximized` (`bool`, optional): Defaults to `True`.
+        Whether or not to start the window maximized.
 
-        - `browser` (`Literal["chrome", "msedge"]`, optional): Defaults to `"msedge"`.
+    - `open_as_app` (`bool`, optional): Defaults to `True`.
+        Whether to open the chromium based browser launching the url in "application mode" with `--app=` argument (separate window).
+        If `True`, the option `STREAMLIT_SERVER_HEADLESS` is set to `True`.
 
-            The chromium based browser in which to run the streamlit app.
+    - `print_command` (`bool`, optional): Defaults to `True`.
+        Whether to print the command executed by this function.
 
-        - `close_opened_window` (`bool`, optional): Defaults to `True`.
+    - `fill_page_content` (`bool`, optional): Defaults to `False`.
+        Whether to fill the web page removing empty spaces.
 
-            Whether to close a previously opened browser window with the same streamlit app name.
+    - `**kwargs`: Additional keyword arguments passed as options to the `streamlit run` command.
+        These keyword arguments have the same names as the environment variables, but passed with
+        lower case and without the prefix `streamlit_`. Use `streamlit run --help` to get a list.
 
-        - `print_command` (`bool`, optional): Defaults to `True`.
+        Some values are predefined, if not given. Namely:
 
-            Whether to print the command executed by this function.
+        + `client_toolbar_mode` (`STREAMLIT_CLIENT_TOOLBAR_MODE`) = `"minimal"`
 
-        - `**kwargs`: Additional keyword arguments passed as options to the `streamlit run` command.
+        + `server_headless` (`STREAMLIT_SERVER_HEADLESS`): `True` if `open_as_app=True`
 
-            These keyword arguments have the same names as the environment variables, but passed with
-            lower case and without the prefix `streamlit_`. Use `streamlit run --help` to get a list.
+        + `server_run_on_save` (`STREAMLIT_SERVER_RUN_ON_SAVE`) = `True`
 
-            Some values are predefined, if not given. Namely:
+        + `server_port` (`STREAMLIT_SERVER_PORT`) = `8501`
 
-                + `client_toolbar_mode` (`STREAMLIT_CLIENT_TOOLBAR_MODE`) = `"minimal"`
-
-                + `server_headless` (`STREAMLIT_SERVER_HEADLESS`): `True` if `open_as_app=True`
-
-                + `server_run_on_save` (`STREAMLIT_SERVER_RUN_ON_SAVE`) = `True`
-
-                + `server_port` (`STREAMLIT_SERVER_PORT`) = `8501`
-
-                + `theme_base` (`STREAMLIT_THEME_BASE`) = `"light"`
-
+        + `theme_base` (`STREAMLIT_THEME_BASE`) = `"light"`
     """
-    if not inside_streamlit_app and not interactively_debugging:
 
-        if kwargs.get("open_as_app", True) and kwargs.get("browser", "msedge") not in ["chrome", "msedge"]:
-            warnings.warn("`open_as_app` option only currently supported for chromium web browsers: 'chrome' and 'msedge'", Warning)
-            kwargs["open_as_app"] = False
+    if kwargs.get("fill_page_content", False):
+        fill_page_content(True, True, True)
+
+    if not inside_streamlit_app and not interactively_debugging:
 
         if "STREAMLIT_SERVER_HEADLESS" not in rc:
             if "STREAMLIT_SERVER_HEADLESS" in os.environ:
@@ -192,7 +211,7 @@ def run(
                 else:
                     rc["STREAMLIT_SERVER_HEADLESS"] = False
 
-        spec_args = ["open_as_app", "browser", "close_opened_window", "print_command"]
+        spec_args = ["open_as_app", "print_command", "title", "maximized"]
 
         for key in kwargs:
             rc[(key if key in spec_args else f"streamlit_{key}").upper()] = kwargs[key]
@@ -202,34 +221,82 @@ def run(
                 os.environ[option] = str(rc[option])
 
         server_headless: bool = rc["STREAMLIT_SERVER_HEADLESS"]
-        close_opened_window: bool = rc.get("CLOSE_OPENED_WINDOW", True)
         print_command: bool = rc.get("PRINT_COMMAND", True)
         open_as_app: bool = rc.get("OPEN_AS_APP", True)
-        browser: str = rc.get("BROWSER", "msedge")
         server_port: int = rc.get("STREAMLIT_SERVER_PORT", 8501)
+        maximized: bool = rc.get("MAXIMIZED", True)
+        title: str = rc.get("TITLE", "Streamlit runner app")
 
-        if close_opened_window:
-            windows1 = pygetwindow.getWindowsWithTitle("streamlit")
-            windows2 = pygetwindow.getWindowsWithTitle(Path(sys.argv[0]).stem)
-            for window in windows1:
-                if window in windows2 and " Streamlit" in window.title:
-                    window.close()
-
-        print()
+        if is_port_in_use(server_port):
+            server_port = get_free_port()
 
         def run_streamlit():
-            command = f'streamlit run --server.headless {server_headless} --server.port {server_port} {sys.argv[0]} -- {" ".join(sys.argv[1:])}'
+            global proc
+            streamlit = Path(sys.executable).resolve().parent / "streamlit.exe"
+            if not streamlit.exists():
+                streamlit = "streamlit"
+            command = f'{streamlit} run --server.headless {server_headless} --server.port {server_port} {sys.argv[0]} -- {" ".join(sys.argv[1:])}'
+
             if print_command:
+                COLUMNS = os.get_terminal_size().columns
+                print("-" * COLUMNS)
+                print("Running command:")
                 print(command)
-            os.system(command)
+                print("-" * COLUMNS)
+
+            proc = subprocess.Popen(command.split())
 
         try:
             if open_as_app:
-                webview.create_window("Hello world", f"http://localhost:{server_port}/")
+                webview.create_window(title, f"http://localhost:{server_port}/", maximized=maximized)
                 webview.start(run_streamlit)
+                kill_streamlit(proc)
             else:
                 run_streamlit()
 
         except KeyboardInterrupt:
             sys.exit()
         sys.exit()
+
+
+def fill_page_content(
+    remove_pad: bool = True,
+    remove_header_footer: bool = True,
+    wide_layout: bool = True,
+) -> None:
+    """Set streamlit page filling it removing all empty spaces"""
+
+    import streamlit as st
+
+    if remove_pad:
+
+        st.markdown(
+            """
+        <style>
+            .block-container {
+                padding-top: 0rem;
+            }
+        </style>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    if remove_header_footer:
+        st.markdown(
+            """
+        <style>
+            header {visibility: hidden;}
+            footer {visibility: hidden;}
+
+            /* Remove top padding from main container */
+            .block-container {
+                padding-top: 0rem;
+                padding-bottom: 0rem;
+            }
+        </style>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    if wide_layout:
+        st.set_page_config(layout="wide")
