@@ -1,6 +1,6 @@
 import streamlitrunner as sr
 
-sr.run(title="Modelos constitutivos")
+sr.run(title="Modelos constitutivos", maximized=True)
 
 ########################################################################################
 # %%          IMPORTS
