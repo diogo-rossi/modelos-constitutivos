@@ -156,11 +156,12 @@ def setup_app(modelos: dict[str, ParametrosClasse]):
     ####################################################################################
 
     left, right = st.columns([24, 100])
-    fechar, modelo = left.columns(2)
-    fechar.button("Close", on_click=sr.close_app)
+    modelo, steps = left.columns(2)
     modelo = modelo.selectbox(
         "Modelo", [name for name in modelos], on_change=on_field_change
     )
+
+    steps = steps.number_input("Steps", value=500, on_change=on_field_change)
 
     ####################################################################################
     # %           PARAMETROS
@@ -200,24 +201,12 @@ def setup_app(modelos: dict[str, ParametrosClasse]):
         )
 
     ####################################################################################
-    # %           TIPO DE ENSAIOS E NUMERO DE STEPS
-    ####################################################################################
-
-    ensaio, steps = left.columns(2)
-    ensaio = ensaio.selectbox(
-        "Ensaio", ["Oedometrico", "Undrained"], on_change=on_field_change
-    )
-    steps = steps.number_input("Steps", value=500, on_change=on_field_change)
-
-    ####################################################################################
     # %           INCREMENTOS
     ####################################################################################
 
+    left.text("Incrementos")
     incrementos: list[float] = [0.0, 0.0001, 0.0, 0.0, 0.0, 0.0]
-    controle = left.selectbox(
-        "Controle", ["Deformacao", "Tensao"], on_change=on_field_change
-    )
-    var = ("sigma", "tau") if controle == "Tensao" else ("varepsilon", "gamma")
+    var = ("sigma", "tau")
     k = 3
     for i, s in enumerate(["x", "y", "z", "xy", "yz", "zx"]):
         k += 1
@@ -227,7 +216,20 @@ def setup_app(modelos: dict[str, ParametrosClasse]):
         incrementos[i] = cols[k].number_input(
             f"d$\\{var[0] if i<3 else var[1]}_{{{s}}}$",
             value=incrementos[i],
-            format=("%.5f" if controle == "Deformacao" else "%.2f"),
+            format="%.2f",
+            on_change=on_field_change,
+        )
+
+    var = ("varepsilon", "gamma")
+    for i, s in enumerate(["x", "y", "z", "xy", "yz", "zx"]):
+        k += 1
+        if k >= 3:
+            k = 0
+            cols = left.columns(3)
+        incrementos[i] = cols[k].number_input(
+            f"d$\\{var[0] if i<3 else var[1]}_{{{s}}}$",
+            value=incrementos[i],
+            format="%.5f",
             on_change=on_field_change,
         )
 
