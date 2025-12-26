@@ -161,7 +161,7 @@ def setup_app(modelos: dict[str, ParametrosClasse]):
         "Modelo", [name for name in modelos], on_change=on_field_change
     )
 
-    steps = steps.number_input("Steps", value=500, on_change=on_field_change)
+    steps = steps.number_input("Steps", value=1000, on_change=on_field_change)
 
     ####################################################################################
     # %           PARAMETROS
