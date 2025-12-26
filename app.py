@@ -569,7 +569,7 @@ def add_plots(
         meshesE = st.session_state["meshesE"]
     else:
 
-        pp, qq, ee = np.meshgrid(p, q, e, indexing="ij")
+        pp, ee, qq = np.meshgrid(p, e, q, indexing="ij")
         fe = np.array(
             material.func_plastica(pp[..., None], qq[..., None], ee[..., None])
         )
